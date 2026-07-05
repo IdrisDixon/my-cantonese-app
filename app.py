@@ -108,10 +108,29 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 直接使用本地相对路径资产，Streamlit 的 enableStaticServing 会直接本地放行
-    # 纯英文路径不会产生任何编码错乱
-    pdf_url = f"static/cantonese_book.pdf#page={target_page}"
+    # 使用你的纯英文绝对路径
+    pdf_url = f"https://huaaan.streamlit.app/static/cantonese_book.pdf#page={target_page}"
     
-    # 纯净的原生 iframe 渲染
-    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="900px" style="border:none; border-radius:8px;"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    st.info(f"💡 当前选中章节的课文在 PDF 的第 **{target_page}** 页")
+    
+    # 🌟 使用 Streamlit 原生的 markdown 链接按钮，这个在 iPad 上绝对不会变白屏！
+    # 点击后，iPad 会直接用系统最丝滑的内置阅读器全屏打开，并且可以无缝切回应用听音频
+    st.markdown(f"""
+    <div style="padding: 20px; background-color: #1e1e1e; border-radius: 8px; text-align: center; border: 1px solid #333;">
+        <p style="color: #ccc; margin-bottom: 15px;">iPad 浏览器限制了网页内嵌，请点击下方按钮阅读：</p>
+        <a href="{pdf_url}" target="_blank" style="
+            display: inline-block; 
+            padding: 14px 28px; 
+            background-color: #ff4b4b; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255,75,75,0.3);
+        ">📖 弹出全屏课本 (自动定位到第 {target_page} 页)</a>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 占位提示，美化右侧界面
+    st.caption("✨ 提示：点击按钮后，你还可以使用 iPad 的『分屏浏览』功能，左边放课本，右边放这个听歌浏览器，体验绝佳！")
