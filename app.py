@@ -108,24 +108,10 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 1. 动态获取你当前的公网网址，确保不管叫什么域名都能精准定位
-    # 自动把原本的相对路径拼接成标准的 HTTPS 绝对网络路径
-    try:
-        from streamlit.web.server.server import Server
-        # 抓取当前 Streamlit Cloud 分发的真实绝对域名
-        base_url = st.get_option("server.baseUrlPath") or ""
-        pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
-    except:
-        pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
-        
-    # 如果上面的动态获取在云端被拦截，你可以把下面这一行的 None 改成你的实际网址
-    # 例如：my_real_url = "https://idris-cantonese.streamlit.app"
-    my_real_url = None 
+    # 用最稳妥的相对路径
+    pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
     
-    if my_real_url:
-        pdf_url = f"{my_real_url.rstrip('/')}/static/粤语(香港话)教程(修订版).pdf#page={target_page}"
-
-    # 2. 备用安全方案：直接提供一键外链跳转按钮（这个在 iPad 上 100% 成功）
+    # 1. 搞一个绝对不会出错的纯文本/Markdown 红色大按钮，100% 绕过 iPad 拦截
     st.markdown(f"""
     <a href="{pdf_url}" target="_blank" style="
         display: block; 
@@ -137,14 +123,8 @@ with col2:
         border-radius: 8px; 
         font-weight: bold;
         margin-bottom: 15px;
-        box-shadow: 0 4px 12px rgba(255,75,75,0.2);
-    ">🔗 点我直接在新窗口全屏看课本 (自动跳到第 {target_page} 页)</a>
+    ">🔗 点击在新窗口全屏打开课本 (自动跳到第 {target_page} 页)</a>
     """, unsafe_allow_html=True)
     
-    # 3. 依然尝试在下方内嵌显示
-    pdf_html = f'<iframe src="{pdf_url}" width="100%" height="800px" style="border:none; border-radius:8px;"></iframe>'
-    st.components.v1.html(pdf_html, height=820)
-    """
-    
-    # 3. 增大高度，使用 streamlit 的 html 组件渲染
-    st.components.v1.html(pdf_html, height=920)
+    # 2. 下方只留一个最简单的普通内嵌，彻底抛弃三引号 HTML 拼接
+    st.markdown(f'<iframe src="{pdf_url}" width="100%" height="800px"></iframe>', unsafe_allow_html=True)
