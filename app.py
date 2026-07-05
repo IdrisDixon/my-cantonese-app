@@ -108,10 +108,13 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 🌟 关键点 1：将 PDF 改为没有任何特殊字符和中文的纯英文路径，彻底避开 iPad 的 URL 编码坑
-    # 🌟 关键点 2：使用你的真实公网绝对路径。这是 Streamlit 静态服务穿透沙箱最稳妥的方式
-    pdf_url = f"https://huaaan.streamlit.app/static/cantonese_book.pdf#page={target_page}"
+    # 1. 你的纯英文 PDF 绝对路径
+    pdf_url = f"https://huaaan.streamlit.app/static/cantonese_book.pdf"
     
-    # 用最纯净、无冗余样式的标准官方 iframe 标签渲染
-    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="900px" style="border:none; border-radius:8px;"></iframe>'
+    # 2. 借用 Mozilla 官方的公共 PDF.js 预览流，并把页码传过去
+    # pdf.js 会把 PDF 极其丝滑地在云端解析好吐给 iPad，瞬间秒开不转圈！
+    pdf_js_viewer = f"https://mozilla.github.io/pdf.js/web/viewer.html?file={pdf_url}#page={target_page}"
+    
+    # 3. 渲染内嵌框
+    pdf_display = f'<iframe src="{pdf_js_viewer}" width="100%" height="900px" style="border:none; border-radius:8px;"></iframe>'
     st.markdown(pdf_display, unsafe_allow_html=True)
