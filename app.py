@@ -108,25 +108,10 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 用最标准、绝对不会编码变形的相对路径
-    pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
+    # 🌟 关键点 1：将 PDF 改为没有任何特殊字符和中文的纯英文路径，彻底避开 iPad 的 URL 编码坑
+    # 🌟 关键点 2：使用你的真实公网绝对路径。这是 Streamlit 静态服务穿透沙箱最稳妥的方式
+    pdf_url = f"https://huaaan.streamlit.app/static/cantonese_book.pdf#page={target_page}"
     
-    # 方案一：提供一个原地查看/下载的按钮。在 iPad 上点击后，它会在原地或弹出层直接预览，完全不会影响左侧音频播放！
-    try:
-        with open("static/粤语(香港话)教程(修订版).pdf", "rb") as f:
-            pdf_bytes = f.read()
-        st.download_button(
-            label=f"📥 在 iPad 弹窗中阅读本课 (第 {target_page} 页)",
-            data=pdf_bytes,
-            file_name="粤语香港话教程.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
-    except Exception as e:
-        st.error(f"读取 PDF 失败，请检查文件是否存在: {e}")
-        
-    st.write("")
-    
-    # 方案二：原地的网页框架（作为对照组，如果上面按钮点开更舒服，可以直接忽略这一块）
-    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="800px" style="border: none; border-radius: 8px; background-color: white;"></iframe>'
+    # 用最纯净、无冗余样式的标准官方 iframe 标签渲染
+    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="900px" style="border:none; border-radius:8px;"></iframe>'
     st.markdown(pdf_display, unsafe_allow_html=True)
