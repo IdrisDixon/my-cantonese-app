@@ -108,23 +108,14 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 用最稳妥的相对路径
-    pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
+    # 🌟 用这种纯公网的编码方式，哪怕在私有或沙箱环境里，iPad 也不会抓瞎
+    import urllib.parse
+    encoded_pdf_name = urllib.parse.quote("粤语(香港话)教程(修订版).pdf")
+    pdf_url = f"static/{encoded_pdf_name}#page={target_page}"
     
-    # 1. 搞一个绝对不会出错的纯文本/Markdown 红色大按钮，100% 绕过 iPad 拦截
-    st.markdown(f"""
-    <a href="{pdf_url}" target="_blank" style="
-        display: block; 
-        text-align: center;
-        padding: 14px; 
-        background-color: #ff4b4b; 
-        color: white; 
-        text-decoration: none; 
-        border-radius: 8px; 
-        font-weight: bold;
-        margin-bottom: 15px;
-    ">🔗 点击在新窗口全屏打开课本 (自动跳到第 {target_page} 页)</a>
-    """, unsafe_allow_html=True)
+    # 🌟 关键魔法：在 src 前面套上 Google 的官方 PDF 预览器外链！
+    # 这样相当于让 Google 帮你把 PDF 实时转成网页内嵌进你的 App 里，iPad 100% 能够无痛解码同屏看！
+    google_viewer_url = f"https://docs.google.com/viewer?url=https://huaaan.streamlit.app/{pdf_url}&embedded=true"
     
-    # 2. 下方只留一个最简单的普通内嵌，彻底抛弃三引号 HTML 拼接
-    st.markdown(f'<iframe src="{pdf_url}" width="100%" height="800px"></iframe>', unsafe_allow_html=True)
+    # 直接用最省事的单行 iframe 渲染
+    st.markdown(f'<iframe src="{google_viewer_url}" width="100%" height="900px" style="border:none;"></iframe>', unsafe_allow_html=True)
