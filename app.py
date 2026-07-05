@@ -108,9 +108,40 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 静态文件夹路径定位，使用 #page 控制自动跳转页码
-    pdf_url = f"app/static/粤语(香港话)教程(修订版).pdf#page={target_page}"
+    # 1. 自动获取当前页面的公共 URL，确保任何设备打开都能精确定位
+    # 这样你就不用手动去代码里硬编码一长串自己的域名了！
+    try:
+        # 兼容旧写法，自动移除末尾可能存在的路径
+        base_url = st.get_option("server.baseUrlPath") or ""
+        # 组装成可以直接访问的静态文件绝对路径
+        pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
+    except:
+        pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
     
-    # 用标准的 iframe 全屏渲染
-    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="900px"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    # 2. 针对 iPad / 移动端 Safari 特性，使用万能的 HTML object 混合渲染
+    # 如果 iPad 实在拒绝内嵌，它会贴心地显示一个蓝色按钮，点一下就能在 iPad 新标签页里完美全屏看 PDF
+    pdf_html = f"""
+    <div style="position: relative; width: 100%; height: 900px; background-color: #f7f9fa; border-radius: 8px; overflow: hidden;">
+        <object data="{pdf_url}" type="application/pdf" width="100%" height="100%">
+            <iframe src="{pdf_url}" width="100%" height="100%" style="border: none;">
+                <div style="padding: 40px; text-align: center; font-family: sans-serif;">
+                    <p style="font-size: 16px; color: #555;">💡 iPad 浏览器限制了网页内嵌预览</p>
+                    <a href="{pdf_url}" target="_blank" style="
+                        display: inline-block; 
+                        padding: 12px 24px; 
+                        background-color: #ff4b4b; 
+                        color: white; 
+                        text-decoration: none; 
+                        border-radius: 4px; 
+                        font-weight: bold;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                        margin-top: 10px;
+                    ">📖 点击一键在新窗口打开课本 (第 {target_page} 页)</a>
+                </div>
+            </iframe>
+        </object>
+    </div>
+    """
+    
+    # 3. 增大高度，使用 streamlit 的 html 组件渲染
+    st.components.v1.html(pdf_html, height=920)
