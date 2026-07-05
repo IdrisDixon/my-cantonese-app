@@ -55,7 +55,7 @@ CHAPTER_DATA = {
     "附录四：本書詞彙音序索引": {"chapter_num": "附录4", "page": 378},
 }
 
-st.title("🎧 粤语（香港话）多媒体阅读器")
+st.title("粤语（香港话）多媒体阅读器")
 st.write("---")
 
 col1, col2 = st.columns([1, 2])
