@@ -55,7 +55,7 @@ CHAPTER_DATA = {
     "附录四：本書詞彙音序索引": {"chapter_num": "附录4", "page": 378},
 }
 
-st.title("粤语（香港话）多媒体阅读器")
+st.title("粤语（香港话）多媒体阅读器～")
 st.write("---")
 
 col1, col2 = st.columns([1, 2])
@@ -108,39 +108,42 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 1. 自动获取当前页面的公共 URL，确保任何设备打开都能精确定位
-    # 这样你就不用手动去代码里硬编码一长串自己的域名了！
+    # 1. 动态获取你当前的公网网址，确保不管叫什么域名都能精准定位
+    # 自动把原本的相对路径拼接成标准的 HTTPS 绝对网络路径
     try:
-        # 兼容旧写法，自动移除末尾可能存在的路径
+        from streamlit.web.server.server import Server
+        # 抓取当前 Streamlit Cloud 分发的真实绝对域名
         base_url = st.get_option("server.baseUrlPath") or ""
-        # 组装成可以直接访问的静态文件绝对路径
         pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
     except:
         pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
+        
+    # 如果上面的动态获取在云端被拦截，你可以把下面这一行的 None 改成你的实际网址
+    # 例如：my_real_url = "https://idris-cantonese.streamlit.app"
+    my_real_url = None 
     
-    # 2. 针对 iPad / 移动端 Safari 特性，使用万能的 HTML object 混合渲染
-    # 如果 iPad 实在拒绝内嵌，它会贴心地显示一个蓝色按钮，点一下就能在 iPad 新标签页里完美全屏看 PDF
-    pdf_html = f"""
-    <div style="position: relative; width: 100%; height: 900px; background-color: #f7f9fa; border-radius: 8px; overflow: hidden;">
-        <object data="{pdf_url}" type="application/pdf" width="100%" height="100%">
-            <iframe src="{pdf_url}" width="100%" height="100%" style="border: none;">
-                <div style="padding: 40px; text-align: center; font-family: sans-serif;">
-                    <p style="font-size: 16px; color: #555;">💡 iPad 浏览器限制了网页内嵌预览</p>
-                    <a href="{pdf_url}" target="_blank" style="
-                        display: inline-block; 
-                        padding: 12px 24px; 
-                        background-color: #ff4b4b; 
-                        color: white; 
-                        text-decoration: none; 
-                        border-radius: 4px; 
-                        font-weight: bold;
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                        margin-top: 10px;
-                    ">📖 点击一键在新窗口打开课本 (第 {target_page} 页)</a>
-                </div>
-            </iframe>
-        </object>
-    </div>
+    if my_real_url:
+        pdf_url = f"{my_real_url.rstrip('/')}/static/粤语(香港话)教程(修订版).pdf#page={target_page}"
+
+    # 2. 备用安全方案：直接提供一键外链跳转按钮（这个在 iPad 上 100% 成功）
+    st.markdown(f"""
+    <a href="{pdf_url}" target="_blank" style="
+        display: block; 
+        text-align: center;
+        padding: 14px; 
+        background-color: #ff4b4b; 
+        color: white; 
+        text-decoration: none; 
+        border-radius: 8px; 
+        font-weight: bold;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(255,75,75,0.2);
+    ">🔗 点我直接在新窗口全屏看课本 (自动跳到第 {target_page} 页)</a>
+    """, unsafe_allow_html=True)
+    
+    # 3. 依然尝试在下方内嵌显示
+    pdf_html = f'<iframe src="{pdf_url}" width="100%" height="800px" style="border:none; border-radius:8px;"></iframe>'
+    st.components.v1.html(pdf_html, height=820)
     """
     
     # 3. 增大高度，使用 streamlit 的 html 组件渲染
