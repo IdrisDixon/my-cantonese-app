@@ -108,13 +108,10 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 1. 你的纯英文 PDF 绝对路径
-    pdf_url = f"https://huaaan.streamlit.app/static/cantonese_book.pdf"
+    # 直接使用本地相对路径资产，Streamlit 的 enableStaticServing 会直接本地放行
+    # 纯英文路径不会产生任何编码错乱
+    pdf_url = f"static/cantonese_book.pdf#page={target_page}"
     
-    # 2. 借用 Mozilla 官方的公共 PDF.js 预览流，并把页码传过去
-    # pdf.js 会把 PDF 极其丝滑地在云端解析好吐给 iPad，瞬间秒开不转圈！
-    pdf_js_viewer = f"https://mozilla.github.io/pdf.js/web/viewer.html?file={pdf_url}#page={target_page}"
-    
-    # 3. 渲染内嵌框
-    pdf_display = f'<iframe src="{pdf_js_viewer}" width="100%" height="900px" style="border:none; border-radius:8px;"></iframe>'
+    # 纯净的原生 iframe 渲染
+    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="900px" style="border:none; border-radius:8px;"></iframe>'
     st.markdown(pdf_display, unsafe_allow_html=True)
