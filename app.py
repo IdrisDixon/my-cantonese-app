@@ -55,82 +55,51 @@ CHAPTER_DATA = {
     "附录四：本書詞彙音序索引": {"chapter_num": "附录4", "page": 378},
 }
 
-st.title("粤语（香港话）多媒体阅读器～")
+st.title("粤语（香港话）自学助手")
 st.write("---")
 
-col1, col2 = st.columns([1, 2])
+# 彻底去掉 col1 和 col2 的分栏，让所有组件在 iPad 上全屏清爽撑开
+st.subheader("🗂️ 章节目录")
+selected_chapter = st.selectbox("选择你要学习的课文：", list(CHAPTER_DATA.keys()))
 
-with col1:
-    st.subheader("🗂️ 章节目录")
-    selected_chapter = st.selectbox("选择你要学习的课文：", list(CHAPTER_DATA.keys()))
-    
-    current_info = CHAPTER_DATA[selected_chapter]
-    target_page = current_info["page"]
-    ch_num = current_info["chapter_num"]
-    
-    st.write("")
-    st.markdown(f"📍 本课起始页：第 **{target_page}** 页")
-    st.write("")
-    
-    st.subheader("🎵 课文音频")
-    
-    audio_dir = "audio"
-    available_audios = []
-    
-    if os.path.exists(audio_dir):
-        # 精准匹配不带前导 0 的文件名。例如：ch_num 为 1 时匹配 1-1.mp3，不匹配 01-1.mp3
-        available_audios = [
-            f for f in os.listdir(audio_dir) 
-            if f.startswith(f"{ch_num}-") and f.lower().endswith(".mp3")
-        ]
-        # 对文件名数字排序（如 1-1, 1-2）
-        available_audios.sort()
+current_info = CHAPTER_DATA[selected_chapter]
+target_page = current_info["page"]
+ch_num = current_info["chapter_num"]
 
-    if available_audios:
-        if len(available_audios) > 1:
-            selected_audio = st.selectbox("选择音频片段：", available_audios)
-        else:
-            selected_audio = available_audios[0]
-            st.caption(f"正在播放：{selected_audio}")
-            
-        audio_path = os.path.join(audio_dir, selected_audio)
-        try:
-            with open(audio_path, "rb") as audio_file:
-                st.audio(audio_file.read(), format="audio/mp3")
-        except Exception as e:
-            st.error(f"音频读取失败: {e}")
+st.markdown(f"📍 对应纸质书课本页码：第 **{target_page}** 页")
+st.write("")
+
+st.subheader("🎵 课文音频")
+
+audio_dir = "audio"
+available_audios = []
+
+if os.path.exists(audio_dir):
+    # 精准匹配不带前导 0 的文件名。例如：ch_num 为 1 时匹配 1-1.mp3
+    available_audios = [
+        f for f in os.listdir(audio_dir) 
+        if f.startswith(f"{ch_num}-") and f.lower().endswith(".mp3")
+    ]
+    # 对文件名数字排序（如 1-1, 1-2）
+    available_audios.sort()
+
+if available_audios:
+    if len(available_audios) > 1:
+        selected_audio = st.selectbox("选择音频片段：", available_audios)
     else:
-        st.warning(f"⚠️ 未找到以 `{ch_num}-` 开头的音频文件")
+        selected_audio = available_audios[0]
+        st.caption(f"正在播放：{selected_audio}")
         
-    st.write("---")
-    st.text_area("📝 随堂笔记：", height=200, placeholder="在此输入你的粤语拼音或笔记...")
+    audio_path = os.path.join(audio_dir, selected_audio)
+    try:
+        with open(audio_path, "rb") as audio_file:
+            st.audio(audio_file.read(), format="audio/mp3")
+    except Exception as e:
+        st.error(f"音频读取失败: {e}")
+else:
+    st.warning(f"⚠️ 未找到以 `{ch_num}-` 开头的音频文件")
+    
+st.write("---")
 
-with col2:
-    st.subheader("📖 PDF 课本正文")
-    
-    # 使用你的纯英文绝对路径
-    pdf_url = f"https://huaaan.streamlit.app/static/cantonese_book.pdf#page={target_page}"
-    
-    st.info(f"💡 当前选中章节的课文在 PDF 的第 **{target_page}** 页")
-    
-    # 🌟 使用 Streamlit 原生的 markdown 链接按钮，这个在 iPad 上绝对不会变白屏！
-    # 点击后，iPad 会直接用系统最丝滑的内置阅读器全屏打开，并且可以无缝切回应用听音频
-    st.markdown(f"""
-    <div style="padding: 20px; background-color: #1e1e1e; border-radius: 8px; text-align: center; border: 1px solid #333;">
-        <p style="color: #ccc; margin-bottom: 15px;">iPad 浏览器限制了网页内嵌，请点击下方按钮阅读：</p>
-        <a href="{pdf_url}" target="_blank" style="
-            display: inline-block; 
-            padding: 14px 28px; 
-            background-color: #ff4b4b; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-weight: bold;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(255,75,75,0.3);
-        ">📖 弹出全屏课本 (自动定位到第 {target_page} 页)</a>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # 占位提示，美化右侧界面
-    st.caption("✨ 提示：点击按钮后，你还可以使用 iPad 的『分屏浏览』功能，左边放课本，右边放这个听歌浏览器，体验绝佳！")
+# 随堂笔记也会自动变宽，iPad 键盘打字记录更舒服
+st.text_area("📝 随堂笔记：", height=250, placeholder="在此输入你的粤语拼音、连读技巧或课堂笔记...")
