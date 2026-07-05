@@ -108,14 +108,25 @@ with col1:
 with col2:
     st.subheader("📖 PDF 课本正文")
     
-    # 🌟 用这种纯公网的编码方式，哪怕在私有或沙箱环境里，iPad 也不会抓瞎
-    import urllib.parse
-    encoded_pdf_name = urllib.parse.quote("粤语(香港话)教程(修订版).pdf")
-    pdf_url = f"static/{encoded_pdf_name}#page={target_page}"
+    # 用最标准、绝对不会编码变形的相对路径
+    pdf_url = f"static/粤语(香港话)教程(修订版).pdf#page={target_page}"
     
-    # 🌟 关键魔法：在 src 前面套上 Google 的官方 PDF 预览器外链！
-    # 这样相当于让 Google 帮你把 PDF 实时转成网页内嵌进你的 App 里，iPad 100% 能够无痛解码同屏看！
-    google_viewer_url = f"https://docs.google.com/viewer?url=https://huaaan.streamlit.app/{pdf_url}&embedded=true"
+    # 方案一：提供一个原地查看/下载的按钮。在 iPad 上点击后，它会在原地或弹出层直接预览，完全不会影响左侧音频播放！
+    try:
+        with open("static/粤语(香港话)教程(修订版).pdf", "rb") as f:
+            pdf_bytes = f.read()
+        st.download_button(
+            label=f"📥 在 iPad 弹窗中阅读本课 (第 {target_page} 页)",
+            data=pdf_bytes,
+            file_name="粤语香港话教程.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+    except Exception as e:
+        st.error(f"读取 PDF 失败，请检查文件是否存在: {e}")
+        
+    st.write("")
     
-    # 直接用最省事的单行 iframe 渲染
-    st.markdown(f'<iframe src="{google_viewer_url}" width="100%" height="900px" style="border:none;"></iframe>', unsafe_allow_html=True)
+    # 方案二：原地的网页框架（作为对照组，如果上面按钮点开更舒服，可以直接忽略这一块）
+    pdf_display = f'<iframe src="{pdf_url}" width="100%" height="800px" style="border: none; border-radius: 8px; background-color: white;"></iframe>'
+    st.markdown(pdf_display, unsafe_allow_html=True)
